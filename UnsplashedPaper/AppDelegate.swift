@@ -36,7 +36,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         let updateNowItem = NSMenuItem(
             title: "Refresh Now",
-            action: #selector(AppDelegate.updateWallpaper),
+            action: #selector(AppDelegate.updateWallpaperSingleShot),
             keyEquivalent: "R")
         updateNowItem.keyEquivalentModifierMask = .command
         
@@ -55,6 +55,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func scheduleUpdateJob() {
+        if timer != nil {
+            timer.invalidate()
+        }
+        
         let defaults = UserDefaults.standard
         
         let updateInterval = defaults.object(forKey: "updateInterval") as? Int ?? 60
@@ -113,7 +117,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     @objc
-    func updateWallpaper() {
+    func updateWallpaper(reschedule: Bool = true) {
         let defaults = UserDefaults.standard
         let scaleImages = defaults.object(forKey: "scaleImages") as? Bool ?? true
         let imagePerScreen = defaults.object(forKey: "imagePerScreen") as? Bool ?? true
@@ -155,7 +159,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
-        scheduleUpdateJob()
+        if(reschedule) {
+            scheduleUpdateJob()
+        }
+    }
+    
+    @objc
+    func updateWallpaperSingleShot() {
+        updateWallpaper(reschedule: false)
     }
     
     

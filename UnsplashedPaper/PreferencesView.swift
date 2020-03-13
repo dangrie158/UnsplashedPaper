@@ -40,6 +40,6 @@ class Preferences: NSViewController {
     }
     
     @IBAction func refreshNow(_ sender: Any) {
-        (NSApp.delegate as! AppDelegate).updateWallpaper()
+        (NSApp.delegate as! AppDelegate).updateWallpaper(reschedule: false)
     }
 }
