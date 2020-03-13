@@ -16,7 +16,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var statusBarItem: NSStatusItem!
     var timer: Timer!
 
-
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         
         let statusBar = NSStatusBar.system
@@ -40,6 +39,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             keyEquivalent: "R")
         updateNowItem.keyEquivalentModifierMask = .command
         
+        let openCacheFolderItem = NSMenuItem(
+            title: "Open Cache Folder",
+            action: #selector(AppDelegate.openCacheFolder),
+            keyEquivalent: "O")
+        openCacheFolderItem.keyEquivalentModifierMask = .command
+        
         let quitItem = NSMenuItem(
             title: "Quit",
             action: #selector(NSApplication.shared.terminate),
@@ -47,6 +52,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         statusBarMenu.addItem(preferencesItem)
         statusBarMenu.addItem(updateNowItem)
+        statusBarMenu.addItem(openCacheFolderItem)
         statusBarMenu.addItem(NSMenuItem.separator())
         statusBarMenu.addItem(quitItem)
         
@@ -175,6 +181,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let storyBoard = NSStoryboard(name:"Main", bundle:nil);
         let controller = storyBoard.instantiateController(withIdentifier: "PreferencesController") as! NSWindowController
         controller.showWindow(self)
+    }
+    
+    @objc
+    func openCacheFolder() {
+        let temporaryDirectoryURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: temporaryDirectoryURL.absoluteString)
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
