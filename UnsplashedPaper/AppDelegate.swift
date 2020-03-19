@@ -124,49 +124,51 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     @objc
     func updateWallpaper(reschedule: Bool = true) {
+        
+        defer {
+            if(reschedule) {
+                scheduleUpdateJob()
+            }
+        }
+        
         let defaults = UserDefaults.standard
         let scaleImages = defaults.object(forKey: "scaleImages") as? Bool ?? true
         let imagePerScreen = defaults.object(forKey: "imagePerScreen") as? Bool ?? true
         let collectionId = defaults.object(forKey: "collectionId") as? String
         let searchQuery = defaults.object(forKey: "searchQuery") as? String
-        
-        do {
-            let workspace = NSWorkspace.shared
+    
+        let workspace = NSWorkspace.shared
 
-            if (imagePerScreen) {
-                for screen in NSScreen.screens {
-                    let screenSize = screen.visibleFrame.size
-                    getRandomWallpaper(withSize: screenSize, fromCollection: collectionId, forSearchterm: searchQuery) { url in
-                        var screenOptions = workspace.desktopImageOptions(for: screen)!
-                        screenOptions[NSWorkspace.DesktopImageOptionKey.imageScaling] = scaleImages
-                        do {
-                            try workspace.setDesktopImageURL(url, for: screen, options: screenOptions)
-                        } catch {
-                            NSLog("\(error)")
-                        }
-                    }
-                }
-            } else {
-                
-                let maxWidth = NSScreen.screens.map{$0.visibleFrame.width}.max()!
-                let maxHeight = NSScreen.screens.map{$0.visibleFrame.height}.max()!
-                let size =  NSSize(width: maxWidth, height: maxHeight)
-                    
-                getRandomWallpaper(withSize: size, fromCollection: collectionId, forSearchterm: searchQuery) { url in
-                    for screen in NSScreen.screens {
-                        var screenOptions = workspace.desktopImageOptions(for: screen)!
-                        screenOptions[NSWorkspace.DesktopImageOptionKey.imageScaling] = scaleImages
-                        do {
-                            try workspace.setDesktopImageURL(url, for: screen, options: screenOptions)
-                        } catch {
-                            NSLog("\(error)")
-                        }
+        if (imagePerScreen) {
+            for screen in NSScreen.screens {
+                let screenSize = screen.visibleFrame.size
+                getRandomWallpaper(withSize: screenSize, fromCollection: collectionId, forSearchterm: searchQuery) { url in
+                    var screenOptions = workspace.desktopImageOptions(for: screen)!
+                    screenOptions[NSWorkspace.DesktopImageOptionKey.imageScaling] = scaleImages
+                    do {
+                        try workspace.setDesktopImageURL(url, for: screen, options: screenOptions)
+                    } catch {
+                        NSLog("\(error)")
                     }
                 }
             }
-        }
-        if(reschedule) {
-            scheduleUpdateJob()
+        } else {
+            
+            let maxWidth = NSScreen.screens.map{$0.visibleFrame.width}.max()!
+            let maxHeight = NSScreen.screens.map{$0.visibleFrame.height}.max()!
+            let size =  NSSize(width: maxWidth, height: maxHeight)
+                
+            getRandomWallpaper(withSize: size, fromCollection: collectionId, forSearchterm: searchQuery) { url in
+                for screen in NSScreen.screens {
+                    var screenOptions = workspace.desktopImageOptions(for: screen)!
+                    screenOptions[NSWorkspace.DesktopImageOptionKey.imageScaling] = scaleImages
+                    do {
+                        try workspace.setDesktopImageURL(url, for: screen, options: screenOptions)
+                    } catch {
+                        NSLog("\(error)")
+                    }
+                }
+            }
         }
     }
     
