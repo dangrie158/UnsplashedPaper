@@ -33,6 +33,10 @@ class Preferences: NSViewController {
         defaults.set(queryString.stringValue, forKey: "searchQuery")
         print(queryString.stringValue)
         defaults.set(updateInterval.intValue, forKey: "updateInterval")
+        
+        let delegate = (NSApp.delegate as! AppDelegate)
+        delegate.cancelUpdateJob()
+        delegate.scheduleUpdateJob()
     }
     
     @IBAction func quitApp(_ sender: Any) {
@@ -40,6 +44,6 @@ class Preferences: NSViewController {
     }
     
     @IBAction func refreshNow(_ sender: Any) {
-        (NSApp.delegate as! AppDelegate).updateWallpaper(reschedule: false)
+        (NSApp.delegate as! AppDelegate).updateWallpaper()
     }
 }
